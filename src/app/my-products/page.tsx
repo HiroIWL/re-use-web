@@ -1,29 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import PageLayout from '../../components/layout/PageLayout';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-import Loading from '../../components/common/Loading';
-import EmptyState from '../../components/ui/EmptyState';
-import { useAuthContext, useProductContext } from '@/contexts';
-import { useDateFormat } from '../../hooks/useDateFormat';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import PageLayout from "../../components/layout/PageLayout";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loading from "../../components/common/Loading";
+import EmptyState from "../../components/ui/EmptyState";
+import { useAuthContext, useProductContext } from "@/contexts";
+import { useDateFormat } from "../../hooks/useDateFormat";
 
 export default function MyProductsPage() {
   const { user, isLoading: authLoading, redirectToLogin } = useAuthContext();
-  const { 
-    myProducts, 
-    isLoadingMyProducts, 
-    loadMyProducts 
-  } = useProductContext();
+  const { myProducts, isLoadingMyProducts, loadMyProducts } =
+    useProductContext();
   const { formatarPreco } = useDateFormat();
   const router = useRouter();
 
   useEffect(() => {
     if (authLoading) return;
-    
+
     if (!user) {
       redirectToLogin();
       return;
@@ -33,13 +30,13 @@ export default function MyProductsPage() {
   }, [user, authLoading, loadMyProducts, redirectToLogin]);
 
   const handleCreateProduct = () => {
-    router.push('/products/add');
+    router.push("/products/add");
   };
 
   const navigation = [
-    { label: 'Início', href: '/swipe' },
-    { label: 'Matches', href: '/matches' },
-    { label: 'Meus Produtos', href: '/my-products', isActive: true }
+    { label: "Início", href: "/swipe" },
+    { label: "Matches", href: "/matches" },
+    { label: "Meus Produtos", href: "/my-products", isActive: true },
   ];
 
   if (isLoadingMyProducts) {
@@ -54,7 +51,7 @@ export default function MyProductsPage() {
 
   return (
     <PageLayout navigation={navigation}>
-      <div className="space-y-6">
+      <div className="space-y-6 p-8">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Meus Produtos</h1>
@@ -62,12 +59,16 @@ export default function MyProductsPage() {
               Gerencie seus produtos e veja quantas pessoas se interessaram
             </p>
           </div>
-          <Button
-            onClick={handleCreateProduct}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            + Criar Produto
-          </Button>
+          {myProducts.length !== 0 ? (
+            <Button
+              onClick={handleCreateProduct}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              + Criar Produto
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
 
         {myProducts.length === 0 ? (
@@ -80,7 +81,10 @@ export default function MyProductsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
             {myProducts.map((produto) => (
-              <Card key={produto.id} className="p-6 hover:shadow-lg transition-shadow">
+              <Card
+                key={produto.id}
+                className="p-6 hover:shadow-lg transition-shadow"
+              >
                 <div className="space-y-4">
                   <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden">
                     {produto.fotos && produto.fotos.length > 0 ? (
@@ -93,8 +97,16 @@ export default function MyProductsPage() {
                       />
                     ) : (
                       <div className="text-gray-400 text-center">
-                        <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                        <svg
+                          className="w-12 h-12 mx-auto mb-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         <p className="text-sm">Sem foto</p>
                       </div>
@@ -107,15 +119,15 @@ export default function MyProductsPage() {
                         {produto.categoria.nome}
                       </span>
                     </div>
-                    
+
                     <h3 className="font-semibold text-gray-900 text-lg">
                       {produto.nome}
                     </h3>
-                    
+
                     <p className="text-gray-600 text-sm line-clamp-2">
                       {produto.descricao}
                     </p>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold text-green-600">
                         {formatarPreco(produto.preco)}
@@ -126,7 +138,9 @@ export default function MyProductsPage() {
                   <div className="border-t pt-4">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Likes: {produto.estatisticas?.likes || 0}</span>
-                      <span>Dislikes: {produto.estatisticas?.dislikes || 0}</span>
+                      <span>
+                        Dislikes: {produto.estatisticas?.dislikes || 0}
+                      </span>
                     </div>
                   </div>
                 </div>
