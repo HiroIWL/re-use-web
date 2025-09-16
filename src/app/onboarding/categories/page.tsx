@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components';
-import { useAuthContext, useCategoryContext } from '@/contexts';
+import { useState, useEffect } from "react";
+import { Button, Logo } from "@/components";
+import { useAuthContext, useCategoryContext } from "@/contexts";
 
 export default function Categories() {
-  const { } = useAuthContext();
-  const { 
-    categories, 
-    isLoadingCategories, 
-    loadCategories, 
-    updateUserInterests 
+  const {} = useAuthContext();
+  const {
+    categories,
+    isLoadingCategories,
+    loadCategories,
+    updateUserInterests,
   } = useCategoryContext();
-  
+
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
+    const user = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
     if (!user && !token) {
-      window.location.href = '/';
+      window.location.href = "/";
       return;
     }
 
@@ -29,9 +29,9 @@ export default function Categories() {
   }, [loadCategories]);
 
   const toggleCategory = (categoryId: number) => {
-    setSelectedCategories(prev => {
+    setSelectedCategories((prev) => {
       if (prev.includes(categoryId)) {
-        return prev.filter(id => id !== categoryId);
+        return prev.filter((id) => id !== categoryId);
       } else {
         return [...prev, categoryId];
       }
@@ -40,13 +40,13 @@ export default function Categories() {
 
   const handleContinue = async () => {
     setIsLoading(true);
-    
+
     try {
       await updateUserInterests(selectedCategories);
-      window.location.href = '/products/add';
+      window.location.href = "/products/add";
     } catch (error) {
-      console.error('Erro ao salvar categorias:', error);
-      alert('Erro de conexão. Tente novamente.');
+      console.error("Erro ao salvar categorias:", error);
+      alert("Erro de conexão. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -56,10 +56,7 @@ export default function Categories() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl font-bold mb-4">
-            <span className="text-purple-600">Re</span>
-            <span className="text-purple-500">Use</span>
-          </div>
+          <Logo size="lg" className="mx-auto mb-4" />
           <p className="text-gray-600">Carregando categorias...</p>
         </div>
       </div>
@@ -68,7 +65,6 @@ export default function Categories() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-8">
-      
       <div className="w-full max-w-md mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Selecione as categorias de produto que lhe interessam
@@ -78,7 +74,6 @@ export default function Categories() {
         </p>
       </div>
 
-      
       <div className="w-full max-w-md mb-8">
         <div className="flex flex-wrap gap-3 justify-center">
           {categories.map((category) => (
@@ -87,8 +82,8 @@ export default function Categories() {
               onClick={() => toggleCategory(category.id)}
               className={`px-4 py-2 rounded-full border-2 transition-all ${
                 selectedCategories.includes(category.id)
-                  ? 'bg-purple-600 text-white border-purple-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:border-purple-300'
+                  ? "bg-purple-600 text-white border-purple-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:border-purple-300"
               }`}
             >
               {category.nome}
@@ -97,19 +92,17 @@ export default function Categories() {
         </div>
       </div>
 
-      
       <div className="w-full max-w-md mb-8">
         <p className="text-center text-gray-600">
-          {selectedCategories.length} categoria{selectedCategories.length !== 1 ? 's' : ''} selecionada{selectedCategories.length !== 1 ? 's' : ''}
+          {selectedCategories.length} categoria
+          {selectedCategories.length !== 1 ? "s" : ""} selecionada
+          {selectedCategories.length !== 1 ? "s" : ""}
           {selectedCategories.length < 2 && (
-            <span className="text-red-500 ml-2">
-              (mínimo 2)
-            </span>
+            <span className="text-red-500 ml-2">(mínimo 2)</span>
           )}
         </p>
       </div>
 
-      
       <div className="w-full max-w-md">
         <Button
           onClick={handleContinue}
