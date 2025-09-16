@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senha     String
+  telefone  String
+
+  produtos  Produto[]
+  likes     Like[]
+  dislikes Dislike[]
+  superLikes SuperLike[]
+  propostas Proposta[]
+
+  categoriasDeInteresse CategoriasDeInteresse[]
+  mensagens Mensagem[]
+  
+  matchesComoUsuario1 Match[] @relation("Usuario1")
+  matchesComoUsuario2 Match[] @relation("Usuario2")
+  
+  @@map("users")
+}
+
+model Categoria {
+  id        Int      @id @default(autoincrement())
+  nome      String
+
+  produtos Produto[]
+  categoriasDeInteresse CategoriasDeInteresse[]
+  @@map("categorias")
+}
+
+model CategoriasDeInteresse {
+  id        Int      @id @default(autoincrement())
+  id_user   Int
+  user      User     @relation(fields: [id_user], references: [id])
+  id_categoria Int
+  categoria   Categoria @relation(fields: [id_categoria], references: [id])
+
+  @@map("categorias_de_interesse")
+}
+
+model Produto {
+  id          Int       @id @default(autoincrement())
+  idUsuario   Int
+  usuario     User      @relation(fields: [idUsuario], references: [id])
+  idCategoria Int
+  categoria   Categoria @relation(fields: [idCategoria], references: [id])
+
+  nome        String
+  descricao   String
+  preco       Float
+
+  propostasOfertadas   Proposta[] @relation("Ofertadas")
+  propostasSolicitadas Proposta[] @relation("Solicitadas")
+  likes                Like[]
+  dislikes Dislike[]
+  superLikes SuperLike[]
+  
+  matchesComoProduto1 Match[] @relation("Produto1")
+  matchesComoProduto2 Match[] @relation("Produto2")
+  
+  @@map("produtos")
+}
+
+model Like {
+  id        Int     @id @default(autoincrement())
+  idProduto Int
+  produto   Produto @relation(fields: [idProduto], references: [id])
+  idUsuario Int
+  usuario   User    @relation(fields: [idUsuario], references: [id])
+
+  @@map("likes")
+}
+
+model Dislike {
+  id        Int     @id @default(autoincrement())
+  idProduto Int
+  idUsuario Int
+
+
+  
+  produto   Produto @relation(fields: [idProduto], references: [id])
+  usuario   User    @relation(fields: [idUsuario], references: [id])
+
+  @@map("dislikes")
+}
+
+model SuperLike {
+  id        Int     @id @default(autoincrement())
+  idUsuario Int
+  idProduto Int
+  mensagem String
+
+  
+  produto   Produto @relation(fields: [idProduto], references: [id])
+  usuario User    @relation(fields: [idUsuario], references: [id])
+  
+  @@map("super_likes")
+}
+
+model Proposta {
+  id        Int  @id @default(autoincrement())
+  idUsuario Int
+  usuario   User @relation(fields: [idUsuario], references: [id])
+
+  idProdutoOfertado Int
+  produtoOfertado   Produto @relation("Ofertadas", fields: [idProdutoOfertado], references: [id])
+
+  idProdutoSolicitado Int
+  produtoSolicitado   Produto @relation("Solicitadas", fields: [idProdutoSolicitado], references: [id])
+
+  @@map("propostas")
+}
+
+model Match {
+  id         Int      @id @default(autoincrement())
+  idUsuario1 Int
+  idUsuario2 Int
+  idProduto1 Int
+  idProduto2 Int
+  criadoEm   DateTime @default(now())
+
+  usuario1 User    @relation("Usuario1", fields: [idUsuario1], references: [id])
+  usuario2 User    @relation("Usuario2", fields: [idUsuario2], references: [id])
+  produto1 Produto @relation("Produto1", fields: [idProduto1], references: [id])
+  produto2 Produto @relation("Produto2", fields: [idProduto2], references: [id])
+
+  mensagens Mensagem[]
+
+  @@map("matches")
+}
+
+model Mensagem {
+  id        Int      @id @default(autoincrement())
+  idUsuario Int
+  usuario   User     @relation(fields: [idUsuario], references: [id])
+  idMatch   Int
+  match     Match    @relation(fields: [idMatch], references: [id])
+  conteudo  String
+  criadoEm  DateTime @default(now())
+
+  @@map("mensagens")
+}
