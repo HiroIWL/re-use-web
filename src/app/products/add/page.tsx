@@ -45,21 +45,20 @@ export default function AdicionarProduto() {
   }, [user, loadCategories]);
 
   const applyPriceMask = (value: string) => {
-    const numbers = value.replace(/[^\d,.]/g, '');
-    
-    if (!numbers) return '';
-    
-    const normalizedValue = numbers.replace(',', '.');
-    
-    const numValue = parseFloat(normalizedValue);
-    if (isNaN(numValue)) return '';
-    
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    const numbers = value.replace(/\D/g, "");
+
+    if (!numbers) return "";
+
+    const cents = parseInt(numbers, 10);
+
+    const reais = cents / 100;
+
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(numValue);
+      maximumFractionDigits: 2,
+    }).format(reais);
   };
 
   const handleInputChange = (
@@ -68,9 +67,9 @@ export default function AdicionarProduto() {
     >
   ) => {
     const { name, value } = e.target;
-    
-    const processedValue = name === 'preco' ? applyPriceMask(value) : value;
-    
+
+    const processedValue = name === "preco" ? applyPriceMask(value) : value;
+
     setFormData((prev) => ({
       ...prev,
       [name]: processedValue,
@@ -89,14 +88,13 @@ export default function AdicionarProduto() {
     setIsLoading(true);
 
     try {
-      const priceValue = formData.preco
-        .replace(/[^\d,]/g, '')
-        .replace(',', '.');
-      
+      const priceValue = formData.preco.replace(/\D/g, "");
+      const priceInReais = parseInt(priceValue, 10) / 100;
+
       await createProduct({
         nome: formData.nome,
         descricao: formData.descricao,
-        preco: parseFloat(priceValue),
+        preco: priceInReais,
         idCategoria: parseInt(formData.categoria),
       });
 
@@ -177,9 +175,7 @@ export default function AdicionarProduto() {
             <Input
               id="preco"
               name="preco"
-              type="number"
-              step="0.01"
-              min="0"
+              type="text"
               value={formData.preco}
               onChange={handleInputChange}
               placeholder="R$ 0,00"
@@ -257,12 +253,10 @@ export default function AdicionarProduto() {
           <Input
             id="preco"
             name="preco"
-            type="number"
-            step="0.01"
-            min="0"
+            type="text"
             value={formData.preco}
             onChange={handleInputChange}
-            placeholder="0,00"
+            placeholder="R$ 0,00"
             label="Preço (R$)"
             error={errors.preco}
           />
